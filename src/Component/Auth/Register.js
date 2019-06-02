@@ -2,6 +2,7 @@ import React from 'react';
 import { Grid, Form, Segment, Button, Header, Message, Icon} from 'semantic-ui-react';
 import { Link } from 'react-router-dom'
 import firebase from '../../firebase';
+import md5 from 'md5';
 
 class Register extends React.Component {
   state = {
@@ -10,7 +11,8 @@ class Register extends React.Component {
     password: '',
     passwordConfirmation: '',
     errors: [],
-    loading: false
+    loading: false,
+    usersRef: firebase.database().ref('users')
   };
 
   handleChange = event => {
@@ -26,7 +28,21 @@ class Register extends React.Component {
         .createUserWithEmailAndPassword(this.state.email, this.state.password)
         .then(createdUser => {
           console.log(createdUser);
-          this.setState({ loading: false });
+          createdUser.user.updateProfile({
+            displayName: this.state.username,
+            photoURL: `http://gravatar.com/avatar/${md5(createdUser.user.email)}?d=identicon`
+          })
+            .then(() => {
+              this.saveUser(createdUser)
+                .then(() => {
+                  console.log("user saved");
+                });
+              this.setState({ loading: false });
+            })
+            .catch(e => {
+              console.error(e);
+              this.setState({ loading: false, errors: this.state.errors.concat(e) });
+            })
         })
         .catch( e => {
           console.error(e);
@@ -103,7 +119,14 @@ class Register extends React.Component {
     return password.length > 6 && passwordConfirmation.length > 6 && password === passwordConfirmation;
   };
 
-  displayErrors = errors => errors.map((error, i) => <p key={i}>{error.message}</p>)
+  displayErrors = errors => errors.map((error, i) => <p key={i}>{error.message}</p>);
+
+  saveUser = createdUser => {
+    return this.state.usersRef.child(createdUser.user.uid).set({
+      name: createdUser.user.displayName,
+      avatar: createdUser.user.photoURL,
+    });
+  }
 }
 
 export default Register;
