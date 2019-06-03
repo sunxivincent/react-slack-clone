@@ -32,16 +32,16 @@ class Register extends React.Component {
             displayName: this.state.username,
             photoURL: `http://gravatar.com/avatar/${md5(createdUser.user.email)}?d=identicon`
           })
-            .then(() => {
-              this.saveUser(createdUser)
-                .then(() => {
-                  console.log("user saved");
-                });
-              this.setState({ loading: false });
-            })
-            .catch(e => {
-              console.error(e);
-              this.setState({ loading: false, errors: this.state.errors.concat(e) });
+          .then(() => {
+            this.saveUser(createdUser)
+              .then(() => {
+                console.log("user saved");
+              });
+            this.setState({ loading: false });
+          })
+          .catch(e => {
+            console.error(e);
+            this.setState({ loading: false, errors: this.state.errors.concat(e) });
             })
         })
         .catch( e => {
