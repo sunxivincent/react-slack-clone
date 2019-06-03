@@ -3,17 +3,16 @@ import "firebase/auth";
 import "firebase/database";
 import "firebase/storage";
 
-
-var config = {
-  apiKey: "AIzaSyCVtx_FYSniLUJGZRuWRily0K_CP6x7ZNk",
-  authDomain: "react-slack-learning.firebaseapp.com",
-  databaseURL: "https://react-slack-learning.firebaseio.com",
-  projectId: "react-slack-learning",
-  storageBucket: "react-slack-learning.appspot.com",
-  messagingSenderId: "722537731090",
-  appId: "1:722537731090:web:539adddcec664080"
+var firebaseConfig = {
+  apiKey: process.env.REACT_APP_FIREBASE_API_KEY,
+  authDomain: "learning-slack123.firebaseapp.com",
+  databaseURL: "https://learning-slack123.firebaseio.com",
+  projectId: "learning-slack123",
+  storageBucket: "",
+  messagingSenderId: "915993528062",
+  appId: "1:915993528062:web:cd222661b675bed0"
 };
 
-firebase.initializeApp(config);
+firebase.initializeApp(firebaseConfig);
 
 export default firebase;
