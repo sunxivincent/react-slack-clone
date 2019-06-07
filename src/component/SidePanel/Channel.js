@@ -46,11 +46,23 @@ class Channel extends React.Component {
       .then(() => {
         this.setState({ channelName: '', channelDetails: ''});
         this.closeModal();
-        console.log("channel added");
       })
       .catch(error => {
-        console.log("channel added");
+        console.log(error);
       })
+  };
+
+
+  componentDidMount() {
+    this.addListeners();
+  }
+
+  addListeners = () => {
+    let loadedChannels = [];
+    this.state.channelsRef.on('child_added', snap => {
+      loadedChannels.push(snap.val());
+      this.setState({ channels: loadedChannels});
+    })
   };
 
   render() {
@@ -63,6 +75,7 @@ class Channel extends React.Component {
             <span> <Icon name="exchange" /> {"CHANNELS "} </span>
             ({ channels.length }) <Icon name="add" onClick={this.openModal} />
           </Menu.Item>
+          {this.displayChannels(channels)}
         </Menu.Menu>
         <Modal basic open={modal} onClose={this.closeModal}>
           <Modal.Header>Add a channel</Modal.Header>
@@ -88,6 +101,15 @@ class Channel extends React.Component {
       </React.Fragment>
     );
   }
+
+
+  displayChannels = (channels) => (
+    channels.length > 0 && channels.map(channel => (
+      <Menu.Item key={channel.id} onClick={() => console.log(channel)} name={channel.name}>
+        #{channel.name}
+      </Menu.Item>
+    ))
+  )
 
 
 }
