@@ -56,9 +56,12 @@ class Channel extends React.Component {
       })
   };
 
-
   componentDidMount() {
     this.addListeners();
+  }
+
+  componentWillUnmount() {
+    this.removeListeners();
   }
 
   addListeners = () => {
@@ -67,6 +70,10 @@ class Channel extends React.Component {
       loadedChannels.push(snap.val());
       this.setState({ channels: loadedChannels }, () => this.setFirstChannel());
     })
+  };
+
+  removeListeners = () => {
+    this.state.channelsRef.off();
   };
 
   render() {
@@ -105,7 +112,6 @@ class Channel extends React.Component {
       </React.Fragment>
     );
   }
-
 
   displayChannels = (channels) => (
     channels.length > 0 && channels.map(channel => (
