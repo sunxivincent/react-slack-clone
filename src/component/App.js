@@ -1,5 +1,5 @@
-import React, { Component } from 'react';
-import { Grid } from 'semantic-ui-react';
+import React, { Component, createRef } from 'react';
+import { Grid, Ref, Sticky } from 'semantic-ui-react';
 import { connect } from 'react-redux';
 
 import './App.css';
@@ -8,18 +8,22 @@ import SidePanel from "./SidePanel/SidePanel";
 import Messages from "./Messages/Messages";
 import MetaPanel from "./MetaPanel/MetaPanel";
 
-const App = ({ currentUser /* this is destruct currentUser from props */ }) => (
-  <Grid columns="equal" className="app" style={{ background: '#eee' }} >
-    <ColorPanel />
-    <SidePanel currentUser={currentUser} />
-    <Grid.Column style={{ marginLeft: 320}}>
-      <Messages />
-    </Grid.Column>
-    <Grid.Column width={4}>
-      <MetaPanel />
-    </Grid.Column>
-  </Grid>
-);
+class App extends React.Component {
+  render() {
+    return (
+      <Grid columns="equal" className="app" style={{background: '#eee'}}>
+        <ColorPanel/>
+        <SidePanel currentUser={this.props.currentUser}/>
+        <Grid.Column style={{marginLeft: 320}}>
+          <Messages/>
+        </Grid.Column>
+        <Grid.Column width={4}>
+          <MetaPanel/>
+        </Grid.Column>
+      </Grid>
+    );
+  }
+}
 
 const mapStateToProps = state => ({
   currentUser: state.user.currentUser,
