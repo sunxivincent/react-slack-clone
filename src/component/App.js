@@ -10,12 +10,20 @@ import MetaPanel from "./MetaPanel/MetaPanel";
 
 class App extends React.Component {
   render() {
+    const { currentUser, currentChannel } = this.props;
     return (
       <Grid columns="equal" className="app" style={{background: '#eee'}}>
         <ColorPanel/>
-        <SidePanel currentUser={this.props.currentUser}/>
+        <SidePanel
+          key={currentUser && currentUser.uid }
+          currentUser={currentUser}
+        />
         <Grid.Column style={{marginLeft: 320}}>
-          <Messages/>
+          <Messages
+            key={currentChannel && currentChannel.id}
+            currentChannel={currentChannel}
+            currentUser={currentUser}
+          />
         </Grid.Column>
         <Grid.Column width={4}>
           <MetaPanel/>
@@ -27,6 +35,7 @@ class App extends React.Component {
 
 const mapStateToProps = state => ({
   currentUser: state.user.currentUser,
+  currentChannel: state.channel.currentChannel
 });
 
 export default connect(mapStateToProps)(App);
