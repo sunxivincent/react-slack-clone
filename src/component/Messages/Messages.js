@@ -16,7 +16,6 @@ class Messages extends React.Component {
     messageLoading: true,
   };
 
-
   componentDidMount() {
     const { channel, user } = this.state;
 
@@ -31,6 +30,7 @@ class Messages extends React.Component {
 
   addMessageListener = channelId => {
     let loadedMessages = [];
+    // actullay child_added will be called X times where X is the number of children node which channelId contains.
     // one child will be appended at one time
     this.state.messageRef.child(channelId).on("child_added",
       snap => {
@@ -41,13 +41,10 @@ class Messages extends React.Component {
         });
       }
     );
-    // actullay child_added will be called X times where X is the number of children node which channelId contains.
-    console.log('messages set' + this.state.messages.length);
   };
 
   render() {
     const { messageRef, messages, channel, user} = this.state;
-    console.log('messages display' + messages.length);
     const displayedMessage =
       messages.length > 0 && (messages.map(message =>
         <Message
@@ -57,11 +54,7 @@ class Messages extends React.Component {
         />
       )
     );
-    // const displayedMessage =
-    //   messages.map(message => (
-    //     <div>message</div>
-    //   ));
-    console.log('render display' + displayedMessage.length);
+
     return (
       <div>
         <MessageHeader/>
