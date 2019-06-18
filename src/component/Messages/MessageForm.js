@@ -55,12 +55,13 @@ class MessageForm extends React.Component {
   };
 
   render() {
-    const { errors } = this.state;
+    const { errors, message, loading} = this.state;
     return (
       <Segment className="message__form">
         <Input
           fluid
           name="message"
+          value={message}
           style={{ marginBottom: '0.7em' }}
           label={<Button icon="add"/>}
           placeholder="write your message"
@@ -76,6 +77,7 @@ class MessageForm extends React.Component {
             icon="edit"
             labelPosition="left"
             onClick={this.sendMessage}
+            disabled={loading}
           />
           <Button
             color="teal"
