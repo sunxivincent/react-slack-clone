@@ -8,7 +8,7 @@ var firebaseConfig = {
   authDomain: "learning-slack123.firebaseapp.com",
   databaseURL: "https://learning-slack123.firebaseio.com",
   projectId: "learning-slack123",
-  storageBucket: "",
+  storageBucket: "learning-slack123.appspot.com",
   messagingSenderId: "915993528062",
   appId: "1:915993528062:web:cd222661b675bed0"
 };
