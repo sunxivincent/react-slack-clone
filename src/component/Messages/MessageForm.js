@@ -89,6 +89,7 @@ class MessageForm extends React.Component {
     }, () => {
       this.state.uploadTask.on('state_changed', snap => {
         const percentUploaded = (snap.bytesTransferred / snap.totalBytes) * 100;
+        this.props.isProgressBarVisible(percentUploaded);
         this.setState({percentUploaded});
       }, err => {
         console.error(err);
