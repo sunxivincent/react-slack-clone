@@ -15,7 +15,10 @@ class Messages extends React.Component {
     messages: [],
     messageLoading: true,
     progressBar: false,
-    numUniqueUsers: ''
+    numUniqueUsers: '',
+    searchTerm: '',
+    searchLoading: false,
+    searchResults: []
   };
 
   componentDidMount() {
@@ -58,11 +61,28 @@ class Messages extends React.Component {
     return channel ? `#${channel.name}` : '';
   };
 
+  handleSearchChange = event => {
+    this.setState({
+      searchTerm: event.target.value,
+      searchLoading: true,
+    }, () => this.handleSearchMessages());
+  };
 
-  render() {
-    const { messageRef, messages, channel, user, progressBar, numUniqueUsers} = this.state;
-    const displayedMessage =
-      messages.length > 0 && (messages.map(message =>
+  handleSearchMessages = () => {
+    const channelMessages = [...this.state.messages];
+    const regex = new RegExp(this.state.searchTerm, 'gi'); // globally and case insensitive
+    const searchResults = channelMessages.reduce((acc, message) => {
+      if (message.content && message.content.match(regex) || message.user.name.match(regex)) {
+        acc.push(message);
+      }
+      return acc;
+    }, []);
+    this.setState({ searchResults });
+    setTimeout(() => this.setState({ searchLoading: false }), 1000)
+  };
+
+  displayedMessage = messages =>
+    messages.length > 0 && (messages.map(message =>
         <Message
           key={message.timestamp}
           message={message}
@@ -71,15 +91,20 @@ class Messages extends React.Component {
       )
     );
 
+  render() {
+    const { messageRef, messages, channel, user, progressBar, numUniqueUsers, searchTerm, searchResults, searchLoading} = this.state;
+
     return (
       <div>
         <MessageHeader
-          channelName = {this.displayChannelName(channel)}
-          numUniqueUsers = {numUniqueUsers}
+          channelName={this.displayChannelName(channel)}
+          numUniqueUsers={numUniqueUsers}
+          handleSearchChange={this.handleSearchChange}
+          searchLoading={searchLoading}
         />
         <Segment>
           <Comment.Group className={progressBar? 'message__progress' : 'messages'}>
-            {displayedMessage}
+            {searchTerm ? this.displayedMessage(searchResults) : this.displayedMessage(messages)}
           </Comment.Group>
         </Segment>
         <MessageForm channel={channel} user={user} messageRef={messageRef} isProgressBarVisible={this.isProgressBarVisible} />
