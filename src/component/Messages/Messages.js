@@ -15,6 +15,7 @@ class Messages extends React.Component {
     messages: [],
     messageLoading: true,
     progressBar: false,
+    numUniqueUsers: ''
   };
 
   componentDidMount() {
@@ -40,6 +41,7 @@ class Messages extends React.Component {
           messages: loadedMessages,
           messageLoading: false,
         });
+        this.countUniqueUsers(loadedMessages)
       }
     );
   };
@@ -52,8 +54,13 @@ class Messages extends React.Component {
     }
   };
 
+  displayChannelName = channel => {
+    return channel ? `#${channel.name}` : '';
+  };
+
+
   render() {
-    const { messageRef, messages, channel, user, progressBar} = this.state;
+    const { messageRef, messages, channel, user, progressBar, numUniqueUsers} = this.state;
     const displayedMessage =
       messages.length > 0 && (messages.map(message =>
         <Message
@@ -66,7 +73,10 @@ class Messages extends React.Component {
 
     return (
       <div>
-        <MessageHeader/>
+        <MessageHeader
+          channelName = {this.displayChannelName(channel)}
+          numUniqueUsers = {numUniqueUsers}
+        />
         <Segment>
           <Comment.Group className={progressBar? 'message__progress' : 'messages'}>
             {displayedMessage}
@@ -76,6 +86,19 @@ class Messages extends React.Component {
       </div>
     );
   }
+
+  countUniqueUsers = loadedMessages => {
+    const uniqueUsers = loadedMessages.reduce((acc, message) => {
+      if (!acc.includes(message.user.name)) {
+        acc.push(message.user.name);
+      }
+      return acc;
+    }, []);
+    const numUniqueUsers = `${uniqueUsers.length}users`;
+    this.setState({ numUniqueUsers });
+  };
+
+
 }
 
 export default Messages;
