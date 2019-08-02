@@ -9,6 +9,8 @@ import Message from "./Message";
 class Messages extends React.Component {
 
   state = {
+    isPrivateChannel: this.props.isPrivateChannel,
+    privateMessagesRef: firebase.database().ref("privateMessages"),
     messageRef: firebase.database().ref("messages"),
     channel: this.props.currentChannel,
     user: this.props.currentUser,
@@ -34,10 +36,11 @@ class Messages extends React.Component {
   };
 
   addMessageListener = channelId => {
+    const ref = this.getMessageRef();
     let loadedMessages = [];
     // actullay child_added will be called X times where X is the number of children node which channelId contains.
     // one child will be appended at one time
-    this.state.messageRef.child(channelId).on("child_added",
+    ref.child(channelId).on("child_added",
       snap => {
         loadedMessages.push(snap.val());
         this.setState({
@@ -49,6 +52,11 @@ class Messages extends React.Component {
     );
   };
 
+  getMessageRef = () => {
+    const { messageRef, privateMessagesRef, isPrivateChannel } = this.state;
+    return isPrivateChannel ? privateMessagesRef : messageRef;
+  };
+
   isProgressBarVisible = percent => {
     if (percent > 0) {
       this.setState({
@@ -58,7 +66,7 @@ class Messages extends React.Component {
   };
 
   displayChannelName = channel => {
-    return channel ? `#${channel.name}` : '';
+    return channel ? `${this.state.isPrivateChannel ? '@' : '#'}${channel.name}` : '';
   };
 
   handleSearchChange = event => {
@@ -92,7 +100,7 @@ class Messages extends React.Component {
     );
 
   render() {
-    const { messageRef, messages, channel, user, progressBar, numUniqueUsers, searchTerm, searchResults, searchLoading} = this.state;
+    const { messageRef, messages, channel, user, progressBar, numUniqueUsers, searchTerm, searchResults, searchLoading, isPrivateChannel} = this.state;
 
     return (
       <div>
@@ -101,13 +109,14 @@ class Messages extends React.Component {
           numUniqueUsers={numUniqueUsers}
           handleSearchChange={this.handleSearchChange}
           searchLoading={searchLoading}
+          isPrivateChannel={isPrivateChannel}
         />
         <Segment>
           <Comment.Group className={progressBar? 'message__progress' : 'messages'}>
             {searchTerm ? this.displayedMessage(searchResults) : this.displayedMessage(messages)}
           </Comment.Group>
         </Segment>
-        <MessageForm channel={channel} user={user} messageRef={messageRef} isProgressBarVisible={this.isProgressBarVisible} />
+        <MessageForm getMessageRef={this.getMessageRef} isPrivateChannel={isPrivateChannel} channel={channel} user={user} messageRef={messageRef} isProgressBarVisible={this.isProgressBarVisible} />
       </div>
     );
   }
