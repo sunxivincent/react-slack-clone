@@ -27,7 +27,7 @@ class App extends React.Component {
           />
         </Grid.Column>
         <Grid.Column width={4}>
-          <MetaPanel/>
+          <MetaPanel key={currentChannel && currentChannel.id } isPrivateChannel={isPrivateChannel}/>
         </Grid.Column>
       </Grid>
     );
@@ -37,7 +37,7 @@ class App extends React.Component {
 const mapStateToProps = state => ({
   currentUser: state.user.currentUser,
   currentChannel: state.channel.currentChannel,
-  isPrivateChannel: state.channel.isPrivateChannel
+  isPrivateChannel: state.channel.isPrivateChannel,
 });
 
 export default connect(mapStateToProps)(App);
