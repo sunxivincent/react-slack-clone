@@ -13,7 +13,9 @@ class App extends React.Component {
     const { currentUser, currentChannel, isPrivateChannel, userPosts } = this.props;
     return (
       <Grid columns="equal" className="app" style={{background: '#eee'}}>
-        <ColorPanel/>
+        <ColorPanel
+          key={currentUser && currentUser.name}
+          currentUser={currentUser}/>
         <SidePanel
           key={currentUser && currentUser.uid }
           currentUser={currentUser}
