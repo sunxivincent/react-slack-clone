@@ -7,6 +7,7 @@ import Message from "./Message";
 import { connect } from 'react-redux';
 import { setUserPosts } from "../../actions/index";
 import Typing from './Typing';
+import Skeleton from './Skeleton';
 
 // TODO invetigate sticky to make message box sticks to the bottom of the screen
 class Messages extends React.Component {
@@ -205,8 +206,18 @@ class Messages extends React.Component {
     }
   };
 
+  displayMessageSkeleton = loading => (
+    loading ? (
+      <React.Fragment>
+        {[...Array(10)].map((_, i) => (
+            <Skeleton key={i} />
+        ))}
+      </React.Fragment>
+    ) : null
+  );
+
   render() {
-    const { messageRef, messages, channel, user, progressBar, numUniqueUsers, searchTerm, searchResults, searchLoading, isPrivateChannel, isChannelStarred, typingUsers} = this.state;
+    const { messageRef, messages, channel, user, progressBar, numUniqueUsers, searchTerm, searchResults, searchLoading, isPrivateChannel, isChannelStarred, typingUsers, messageLoading} = this.state;
 
     return (
       <div>
@@ -221,6 +232,7 @@ class Messages extends React.Component {
         />
         <Segment>
           <Comment.Group className={progressBar? 'message__progress' : 'messages'}>
+            {this.displayMessageSkeleton(messageLoading)}
             {searchTerm ? this.displayedMessage(searchResults) : this.displayedMessage(messages)}
             {this.displayTypingUsers(typingUsers)}
             <div ref={node => (this.messageEnd = node)}></div>
