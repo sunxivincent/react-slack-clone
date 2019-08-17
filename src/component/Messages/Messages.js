@@ -6,6 +6,7 @@ import firebase from "../../firebase";
 import Message from "./Message";
 import { connect } from 'react-redux';
 import { setUserPosts } from "../../actions/index";
+import Typing from './Typing';
 
 // TODO invetigate sticky to make message box sticks to the bottom of the screen
 class Messages extends React.Component {
@@ -167,6 +168,9 @@ class Messages extends React.Component {
         <Segment>
           <Comment.Group className={progressBar? 'message__progress' : 'messages'}>
             {searchTerm ? this.displayedMessage(searchResults) : this.displayedMessage(messages)}
+            <div style={{ display: 'flex', alignItems: "center"}}>
+              <span className="user__typing">ssss typing</span> <Typing/>
+            </div>
           </Comment.Group>
         </Segment>
         <MessageForm getMessageRef={this.getMessageRef} isPrivateChannel={isPrivateChannel} channel={channel} user={user} messageRef={messageRef} isProgressBarVisible={this.isProgressBarVisible} />
