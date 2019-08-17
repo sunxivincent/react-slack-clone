@@ -10,7 +10,14 @@ class UserPanel extends React.Component {
     modal: false,
     previewImage: "",
     croppedImage: "",
-    blob: ''
+    uploadedCroppedImage: "",
+    blob: '',
+    storageRef: firebase.storage().ref(),
+    userRef: firebase.auth().currentUser,
+    usersRef: firebase.database().ref("users"),
+    metadata: {
+      contentType: 'image/jpeg',
+    }
   };
 
   openModal = () => this.setState({ modal: true });
@@ -84,7 +91,7 @@ class UserPanel extends React.Component {
             </Modal.Content>
             <Modal.Actions>
               {croppedImage && (
-                <Button color="green" inverted>
+                <Button color="green" onClick={this.uploadCroppedImage} inverted>
                   <Icon name="save"/> Change Avatar
                 </Button>
               )}
@@ -148,6 +155,42 @@ class UserPanel extends React.Component {
         })
       });
     }
+  };
+
+  uploadCroppedImage = () => {
+    const { storageRef, userRef, metadata, blob } = this.state;
+    storageRef
+      .child(`avatars/user-${userRef.uid}`)
+      .put(blob, metadata)
+      .then(snap => {
+        snap.ref.getDownloadURL().then(
+          url => this.setState({
+            uploadedCroppedImage: url
+          }, () => this.changeAvatar())
+        )
+      })
+  };
+
+  changeAvatar = () => {
+    this.state.userRef
+      .updateProfile(({
+        photoURL: this.state.uploadedCroppedImage
+      }))
+      .then(() => {
+        console.log("photo url uploaded");
+        this.closeModal();
+      })
+      .catch(e => console.error(e));
+
+    this.state.usersRef
+      .child(this.state.user.uid)
+      .update({
+        avatar: this.state.uploadedCroppedImage
+      })
+      .then(() => {
+        console.log("user avatar upadted")
+      })
+      .catch(e => console.error(e));
   }
 }
 
