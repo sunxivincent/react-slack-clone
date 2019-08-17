@@ -16,6 +16,8 @@ class Messages extends React.Component {
     privateMessagesRef: firebase.database().ref("privateMessages"),
     messageRef: firebase.database().ref("messages"),
     usersRef: firebase.database().ref('users'),
+    typingRef: firebase.database().ref('typing'),
+    connectedRef: firebase.database().ref('.info/connected'),
     channel: this.props.currentChannel,
     user: this.props.currentUser,
     messages: [],
@@ -26,6 +28,7 @@ class Messages extends React.Component {
     searchLoading: false,
     searchResults: [],
     isChannelStarred: false,
+    typingUsers: [],
   };
 
   componentDidMount() {
@@ -39,6 +42,45 @@ class Messages extends React.Component {
 
   addListeners = channelId => {
     this.addMessageListener(channelId);
+    this.addTypingListensers(channelId);
+  };
+
+  addTypingListensers = channelId => {
+    // TODO: using map.. .
+    let typingUsers = [];
+    this.state.typingRef.child(channelId).on('child_added', snap => {
+      if (snap.key !== this.state.user.uid) {
+        typingUsers = typingUsers.concat({
+          id: snap.key, // user's uid
+          name: snap.val() // user' displayName
+        });
+        this.setState({ typingUsers });
+      }
+    });
+
+    this.state.typingRef.child(channelId).on('child_removed', snap => {
+      const index = typingUsers.findIndex(user => user.id === snap.key);
+      if (index !== -1) {
+        typingUsers = typingUsers.filter(user => user.id !== snap.key);
+        this.setState({ typingUsers });
+      }
+    });
+
+    this.state.connectedRef.on('value', snap => {
+      if (snap.val() === true) {
+        this.state.typingRef
+          .child(channelId)
+          .child(this.state.user.uid)
+          .onDisconnect()
+          .remove(
+            error => {
+              if (error !== null) {
+                console.log(error);
+              }
+            }
+          )
+      }
+    })
   };
 
   addMessageListener = channelId => {
@@ -152,7 +194,7 @@ class Messages extends React.Component {
   };
 
   render() {
-    const { messageRef, messages, channel, user, progressBar, numUniqueUsers, searchTerm, searchResults, searchLoading, isPrivateChannel, isChannelStarred} = this.state;
+    const { messageRef, messages, channel, user, progressBar, numUniqueUsers, searchTerm, searchResults, searchLoading, isPrivateChannel, isChannelStarred, typingUsers} = this.state;
 
     return (
       <div>
@@ -168,15 +210,23 @@ class Messages extends React.Component {
         <Segment>
           <Comment.Group className={progressBar? 'message__progress' : 'messages'}>
             {searchTerm ? this.displayedMessage(searchResults) : this.displayedMessage(messages)}
-            <div style={{ display: 'flex', alignItems: "center"}}>
-              <span className="user__typing">ssss typing</span> <Typing/>
-            </div>
+            {this.displayTypingUsers(typingUsers)}
           </Comment.Group>
         </Segment>
         <MessageForm getMessageRef={this.getMessageRef} isPrivateChannel={isPrivateChannel} channel={channel} user={user} messageRef={messageRef} isProgressBarVisible={this.isProgressBarVisible} />
       </div>
     );
   }
+
+  displayTypingUsers = users => (
+    users.length > 0 && (
+      users.map(user =>
+        <div key={user.id} style={{ display: 'flex', alignItems: "center"}}>
+          <span className="user__typing">{user.name} is typing</span> <Typing/>
+        </div>
+      )
+    )
+  );
 
   countUniqueUsers = loadedMessages => {
     const uniqueUsers = loadedMessages.reduce((acc, message) => {
