@@ -22,6 +22,10 @@ class ColorPanel extends React.Component {
     }
   }
 
+  componentWillUnmount() {
+    this.removeListener();
+  }
+
   addListener = (userId) => {
     let userColors = [];
     this.state.usersRef
@@ -30,6 +34,10 @@ class ColorPanel extends React.Component {
           userColors.unshift(snap.val());
           this.setState({ userColors });
       })
+  };
+
+  removeListener = () => {
+    this.state.usersRef.child(`${this.state.user.uid}/colors`).off();
   };
 
   openModal = () => this.setState({ modal: true });
